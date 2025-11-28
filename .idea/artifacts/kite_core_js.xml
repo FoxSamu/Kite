@@ -1,0 +1,6 @@
+<component name="ArtifactManager">
+  <artifact type="jar" name="kite-core-js">
+    <output-path>$PROJECT_DIR$/kite-core/build/libs</output-path>
+    <root id="archive" name="kite-core-js.jar" />
+  </artifact>
+</component>
