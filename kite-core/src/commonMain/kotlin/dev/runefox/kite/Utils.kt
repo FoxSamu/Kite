@@ -1,3 +1,5 @@
+@file:Suppress("UNCHECKED_CAST")
+
 package dev.runefox.kite
 
 import kotlin.coroutines.Continuation
@@ -140,32 +142,30 @@ internal class CoroutineRunner<T>(
 }
 
 
-internal class MaybeVar<T> {
-    private var present = false
+internal class OptionVar<T> {
+    var some = false
+        private set
+
     private var value: T? = null
 
-    fun set(value: T) {
+    fun some(value: T) {
         this.value = value
-        this.present = true
+        this.some = true
     }
 
-    fun unset() {
-        this.present = false
+    fun none() {
+        this.some = false
     }
 
-    fun has(): Boolean {
-        return present
+    fun value(): T {
+        if (some) return value as T else throw NoSuchElementException()
     }
 
-    fun require(): T {
-        if (has()) {
-            return value as T
-        } else {
-            throw NoSuchElementException()
-        }
+    fun valueOrNull(): T? {
+        return if (some) value else null
     }
 
-    fun get(): T? {
-        return value
+    fun maybeValue(): Option<T> {
+        return if (some) Option.some(value as T) else Option.none
     }
 }

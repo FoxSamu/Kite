@@ -11,7 +11,15 @@ package dev.runefox.kite
 
 
 /**
- * Creates a [Mono] that always publishes [value].
+ * Creates a [Mute] that always immediately completes.
+ */
+fun Mute.Companion.just(): Mute {
+    return generator { EmptyGenerator(it) }
+}
+
+
+/**
+ * Creates a [Mono] that always immediately publishes [value].
  */
 fun <T> Mono.Companion.just(value: T): Mono<T> {
     return generator { SingleGenerator(it, value) }
@@ -19,14 +27,14 @@ fun <T> Mono.Companion.just(value: T): Mono<T> {
 
 
 /**
- * Creates a [Maybe] that always publishes 0 values.
+ * Creates a [Maybe] that always immediately completes without value.
  */
-fun <T> Maybe.Companion.just(): Maybe<T> {
+fun Maybe.Companion.just(): Maybe<Nothing> {
     return generator { EmptyGenerator(it) }
 }
 
 /**
- * Creates a [Maybe] that always publishes 1 value, namely [value].
+ * Creates a [Maybe] that always immediately publishes [value].
  */
 fun <T> Maybe.Companion.just(value: T): Maybe<T> {
     return generator { SingleGenerator(it, value) }
@@ -34,21 +42,21 @@ fun <T> Maybe.Companion.just(value: T): Maybe<T> {
 
 
 /**
- * Creates a [Many] that always publishes 0 values.
+ * Creates a [Many] that always immediately completes without any values.
  */
-fun <T> Many.Companion.just(): Many<T> {
+fun Many.Companion.just(): Many<Nothing> {
     return generator { EmptyGenerator(it) }
 }
 
 /**
- * Creates a [Many] that always publishes 1 value, namely [value].
+ * Creates a [Many] that always immediately publishes [value] and then completes.
  */
 fun <T> Many.Companion.just(value: T): Many<T> {
     return generator { SingleGenerator(it, value) }
 }
 
 /**
- * Creates a [Many] that always publishes a specific sequence of values, namely [values].
+ * Creates a [Many] that always immediately publishes the given [values] and then completes.
  */
 fun <T> Many.Companion.just(vararg values: T): Many<T> {
     return when (values.size) {
@@ -59,7 +67,7 @@ fun <T> Many.Companion.just(vararg values: T): Many<T> {
 }
 
 /**
- * Creates a [Many] that always publishes a specific sequence of values, namely [values].
+ * Creates a [Many] that always immediately publishes the given [values] and then completes.
  */
 fun <T> Many.Companion.just(values: Iterable<T>): Many<T> {
     if (values is List<T> && values.size < 2) {
@@ -73,15 +81,8 @@ fun <T> Many.Companion.just(values: Iterable<T>): Many<T> {
 }
 
 /**
- * Creates a [Many] that always publishes a specific sequence of values, namely [values].
+ * Creates a [Many] that always immediately publishes the given [values] and then completes.
  */
 fun <T> Many.Companion.just(values: Sequence<T>): Many<T> {
-    return generator { IterableGenerator(it, values.iterator()) }
-}
-
-/**
- * Creates a [Many] that always publishes a specific sequence of values, namely [values].
- */
-fun <T> Many.Companion.just(values: Iterator<T>): Many<T> {
     return generator { IterableGenerator(it, values.iterator()) }
 }

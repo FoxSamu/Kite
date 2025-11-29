@@ -123,132 +123,6 @@ fun <A, B> Pair<A, B>.flip(): Pair<B, A> {
     return Pair(second, first)
 }
 
-/**
- * Curry the given value [a] over the function.
- */
-fun <A, R> ((A) -> R).curry(a: A): (() -> R) {
-    return { this(a) }
-}
-
-/**
- * Curry the given value [a] over the function.
- */
-fun <A, B, R> ((A, B) -> R).curry(a: A): ((B) -> R) {
-    return { b -> this(a, b) }
-}
-
-/**
- * Curry the given values [a] and [b] over the function.
- */
-fun <A, B, R> ((A, B) -> R).curry(a: A, b: B): (() -> R) {
-    return { this(a, b) }
-}
-
-/**
- * Curry the given [Pair]'s elements over the function.
- */
-fun <A, B, R> ((A, B) -> R).curry(pair: Pair<A, B>): (() -> R) {
-    return { this(pair.first, pair.second) }
-}
-
-/**
- * Curry the given value [a] over the function.
- */
-fun <A, B, C, R> ((A, B, C) -> R).curry(a: A): ((B, C) -> R) {
-    return { b, c -> this(a, b, c) }
-}
-
-/**
- * Curry the given values [a] and [b] over the function.
- */
-fun <A, B, C, R> ((A, B, C) -> R).curry(a: A, b: B): ((C) -> R) {
-    return { c -> this(a, b, c) }
-}
-
-/**
- * Curry the given values [a], [b] and [c] over the function.
- */
-fun <A, B, C, R> ((A, B, C) -> R).curry(a: A, b: B, c: C): (() -> R) {
-    return { this(a, b, c) }
-}
-
-/**
- * Curry the given [Pair]'s elements over the function.
- */
-fun <A, B, C, R> ((A, B, C) -> R).curry(pair: Pair<A, B>): ((C) -> R) {
-    return { c -> this(pair.first, pair.second, c) }
-}
-
-/**
- * Curry the given [Triple]'s elements over the function.
- */
-fun <A, B, C, R> ((A, B, C) -> R).curry(triple: Triple<A, B, C>): (() -> R) {
-    return { this(triple.first, triple.second, triple.third) }
-}
-
-/**
- * Curry the given value [a] over the function.
- */
-fun <A, R> (suspend (A) -> R).curry(a: A): (suspend () -> R) {
-    return { this(a) }
-}
-
-/**
- * Curry the given value [a] over the function.
- */
-fun <A, B, R> (suspend (A, B) -> R).curry(a: A): (suspend (B) -> R) {
-    return { b -> this(a, b) }
-}
-
-/**
- * Curry the given values [a] and [b] over the function.
- */
-fun <A, B, R> (suspend (A, B) -> R).curry(a: A, b: B): (suspend () -> R) {
-    return { this(a, b) }
-}
-
-/**
- * Curry the given [Pair]'s elements over the function.
- */
-fun <A, B, R> (suspend (A, B) -> R).curry(pair: Pair<A, B>): (suspend () -> R) {
-    return { this(pair.first, pair.second) }
-}
-
-/**
- * Curry the given value [a] over the function.
- */
-fun <A, B, C, R> (suspend (A, B, C) -> R).curry(a: A): (suspend (B, C) -> R) {
-    return { b, c -> this(a, b, c) }
-}
-
-/**
- * Curry the given values [a] and [b] over the function.
- */
-fun <A, B, C, R> (suspend (A, B, C) -> R).curry(a: A, b: B): (suspend (C) -> R) {
-    return { c -> this(a, b, c) }
-}
-
-/**
- * Curry the given values [a], [b] and [c] over the function.
- */
-fun <A, B, C, R> (suspend (A, B, C) -> R).curry(a: A, b: B, c: C): (suspend () -> R) {
-    return { this(a, b, c) }
-}
-
-/**
- * Curry the given [Pair]'s elements over the function.
- */
-fun <A, B, C, R> (suspend (A, B, C) -> R).curry(pair: Pair<A, B>): (suspend (C) -> R) {
-    return { c -> this(pair.first, pair.second, c) }
-}
-
-/**
- * Curry the given [Triple]'s elements over the function.
- */
-fun <A, B, C, R> (suspend (A, B, C) -> R).curry(triple: Triple<A, B, C>): (suspend () -> R) {
-    return { this(triple.first, triple.second, triple.third) }
-}
-
 
 /**
  * A [Box] is a simple object that stores a value. A [Box] can store a nullable value and therefore allows passing nullable values where non-nullable
@@ -473,11 +347,11 @@ class Option<out T> private constructor(
 ) {
     val isNone get() = !isSome
 
-    fun value(): T {
+    fun get(): T {
         return if (isSome) value as T else throw NoSuchElementException("Option value is None")
     }
 
-    fun valueOrNull(): T? {
+    fun getOrNull(): T? {
         return if (isSome) value else null
     }
 
@@ -504,18 +378,18 @@ class Option<out T> private constructor(
          * The only [Option] instance representing **none**. It is an [Option] of the type [Nothing]. Since [Nothing] is a subtype of every type,
          * this value is assignable to all [Option] types.
          */
-        val none = Option(false, null)
+        val none: Option<Nothing> = Option(false, null)
 
         /**
          * Creates an [Option] representing **some [T]**. It is an an [Option] of type [T], which is assignable to any [Option] whose type is [T]
          * or any supertype thereof.
          */
-        fun <T> some(value: T) = Option(true, value)
+        fun <T> some(value: T): Option<T> = Option(true, value)
 
         /**
          * If the given value is not null, returns a [some]. If the given value is null, returns a [none].
          */
-        fun <T> maybe(value: T?) = if (value == null) none else some(value)
+        fun <T> maybe(value: T?): Option<T> = if (value == null) none else some(value)
     }
 }
 
@@ -537,7 +411,7 @@ fun <T> T?.wrapMaybe(): Option<T> {
  * Folds this [Option] into a single value, mapping a present value using [present] and an absent value using [absent].
  */
 inline fun <T, U> Option<T>.fold(present: (T) -> U, absent: () -> U): U {
-    return if (this.isSome) present(value()) else absent()
+    return if (this.isSome) present(get()) else absent()
 }
 
 /**
@@ -783,13 +657,13 @@ class Either<out A, out B> private constructor(
          * Returns an [Either] of first type [T] and second type [Nothing]. Due covariance of [Either], you may assign this value to any [Either]
          * type whose first type is [T] or a supertype thereof. The second type will always be compatible because [Nothing] assigns to everything.
          */
-        fun <T> first(value: T) = Either(false, value, null)
+        fun <T> first(value: T): Either<T, Nothing> = Either(false, value, null)
 
         /**
          * Returns an [Either] of first type [Nothing] and second type [T]. Due covariance of [Either], you may assign this value to any [Either]
          * type whose second type is [T] or a supertype thereof. The first type will always be compatible because [Nothing] assigns to everything.
          */
-        fun <T> second(value: T) = Either(false, null, value)
+        fun <T> second(value: T): Either<Nothing, T> = Either(false, null, value)
     }
 }
 

@@ -19,7 +19,7 @@ internal interface Destination<T> : Pipe {
      * Emits a value. If the pipe was closed after emission, this returns null so this null can cascade easily by using `?: return null`.
      * If the pipe was still open after emission, [Unit] is returned.
      */
-    fun emit(item: T): Unit? {
+    fun emit(item: T): Any? {
         if (!closed) {
             dst.receive(item)
         }
@@ -58,7 +58,7 @@ internal interface Source<I> : Receiver<I> {
     val closed: Boolean
     val src: Pipe
 
-    fun take(n: Long = 1): Unit? {
+    fun take(n: Long = 1): Any? {
         if (!closed) {
             src.request(n)
         }
@@ -66,7 +66,7 @@ internal interface Source<I> : Receiver<I> {
         return if (closed) null else Unit
     }
 
-    fun takeAll(n: Long = 1): Unit? {
+    fun takeAll(n: Long = 1): Any? {
         if (!closed) {
             src.requestAll()
         }
@@ -155,7 +155,7 @@ internal class IterableGenerator<T>(
     receiver: Receiver<T>,
     val value: Iterator<T>
 ) : Generator<T>(receiver) {
-    private fun checkNext(): Unit? {
+    private fun checkNext(): Any? {
         val hasNext = try {
             value.hasNext()
         } catch (e: Throwable) {
@@ -169,7 +169,7 @@ internal class IterableGenerator<T>(
         return Unit
     }
 
-    private fun emitNext(): Unit? {
+    private fun emitNext(): Any? {
         checkNext() ?: return null
 
         val value = try {
@@ -195,6 +195,12 @@ internal class IterableGenerator<T>(
     }
 }
 
+internal inline fun Mute.Companion.generator(crossinline generator: (Receiver<Nothing>) -> Generator<Nothing>) = object : Mute {
+    override fun subscribe(receiver: Receiver<Nothing>) {
+        generator(receiver).open()
+    }
+}
+
 internal inline fun <T> Mono.Companion.generator(crossinline generator: (Receiver<T>) -> Generator<T>) = object : Mono<T> {
     override fun subscribe(receiver: Receiver<T>) {
         generator(receiver).open()
@@ -210,6 +216,12 @@ internal inline fun <T> Maybe.Companion.generator(crossinline generator: (Receiv
 internal inline fun <T> Many.Companion.generator(crossinline generator: (Receiver<T>) -> Generator<T>) = object : Many<T> {
     override fun subscribe(receiver: Receiver<T>) {
         generator(receiver).open()
+    }
+}
+
+internal inline fun Mute.operator(crossinline operator: (Receiver<Nothing>) -> Operator<Nothing, Nothing>) = object : Mute {
+    override fun subscribe(receiver: Receiver<Nothing>) {
+        this@operator.subscribe(operator(receiver))
     }
 }
 
